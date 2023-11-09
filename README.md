@@ -1,7 +1,7 @@
 # sEMG-Sim version: 1.0
   Surface Electromyography Simulator
 
-# Authors: Josef Erik Djärf & Ahmad AlOsta
+# Authors: Ahmad AlOsta & Josef Erik Djärf 
 This code is the result of our Master's thesis project. What follows below is some general information about the project and a discription of the project.
 Our objective was to implement an sEMG simulation model in Python. The model is based on mathematical models obtained
 from scientific literature. The model contains several adjustable parameters including motor unit properties (size, firing rate, etc),
@@ -11,7 +11,7 @@ volume conductor, and setup for the recording electrodes.
 Multiple parameter modelling of synthetic electromyography (EMG) data.
 In association with the Neuroengineering group, Departement of Biomedical Engineering, Faculty of Engineering, Lund Universty, Sweden.
 
-# Authors: Josef Djärf & Ahmad Alosta
+# Authors:  Ahmad Alosta & Josef Djärf
 # Supervisors: Robin Rohlén, & Jonathan Lundsberg (Assistant)
 # Examiner: Christian Antfolk
 Start-End Dates: Started 2023-08-29, preliminary ending date 2024-01-14. (Academic Term)
