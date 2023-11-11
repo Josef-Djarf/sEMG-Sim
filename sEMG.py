@@ -5,35 +5,47 @@ import random
 from matplotlib.ticker import NullFormatter
 plt.rcParams['font.family'] = 'Times New Roman'
 
-  #########################    #########################    ##########################    #######################
-  #########################    #########################    ##########################    #######################
-
 class SurfaceEMG:
-  """A class that erepresnts a suface EMG (sEMG).
+  """A class that erepresnts a surface EMG (sEMG).
 
   Methods:
+    simulate_recruitment_model: 
+    plot_recruitment_model:
+    simulate_suface_EMG: 
+    plot_suface_EMG:  
 
   Attributes:
-    T: Total simulation time in seconds.
-    sampling_rate: Sample rate.
-    ramp: Up-stable-down in seconds.
-    maximum_excitation_level: Percentage % of max exc.
+    For simulate_recruitment_model:
+      simulation_time: Total simulation time in seconds.
+      sampling_rate: Sample rate in Hz.
+      ramp: Up-stable-down in seconds.
+      maximum_excitation_level: Percentage % of max exc.
+      number_of_motor_units: Number of motoneurons in the pool.
+      recruitment_range: Range of recruitment threshold values.
+      excitatory_gain: Gain of the excitatory drive-firing rate relationship.
+      minimum_firing_rate: Minimum firing rate (Hz).
+      peak_firing_rate_first_unit: Peak firing rate of the first motoneuron (Hz).
+      peak_firing_rate_difference: Desired difference in peak firing rates between the first and last units (Hz):
+      inter_spike_interval_coefficient_variation: The inter spike interval variance coefficient.
+    
+    For simulate_surface_emg:
+      twitch_force_range: The range of twitch forces RP (force units).
+      motor_unit_density: The motor-unit fibre density (20 unit fibres/mm^2 area of muscle).
+      smallest_motor_unit_number_of_fibres: The smallest motor unit innervated 28 fibres.
+      largest_motor_unit_number_of_fibres: The largest motor unit innervated 2728 fibres.
+      muscle_fibre_diameter: The muscle-fibre diameter (46 µm).
+      muscle_cross_sectional_diameter: The muscle cross-sectional diameter (1.5 cm).
+      electrodes_in_z: Number of elecrodes in the array, in the direction of the fibre.
+      electrodes_in_x: Number of electrodes in the array across the fiber.
 
-    number_of_motor_units: Number of motoneurons in the pool.
-    recruitment_range: Range of recruitment threshold values.
-    excitatory_gain: Gain of the excitatory drive-firing rate relationship.
-    minimum_firing_rate: Minimum firing rate (Hz).
-    peak_firing_rate_first_unit: Peak firing rate of the first motoneuron (Hz).
-    peak_firing_rate_difference: Desired difference in peak firing rates between the first and last units (Hz):
-    inter_spike_interval_coefficient_variation: 
-
+    For plotting methods:
+      y_limit_minimum: Minimum value of plot y-axis.
+      y_limit_maximum: Maximum value of plot y-axis.
   """
   ...
 
   def __init__(self):
     """Initializes a new sEMG object.
-
-    Args:
 
     """
     ...
@@ -67,12 +79,11 @@ class SurfaceEMG:
     self.y_limit_minimum = -1
     self.y_limit_maximum = 1
 
-  #########################    ######################### Simulate Recruitment Model ##########################    #######################
+  #########################  1  #########################  Simulate Recruitment Model ##########################    #######################
   def simulate_recruitment_model(self):
     """Generates the recruitment and rate coding organization of motor units.
 
     Arguments:
-
       According to Models of Recruitment and Rate Coding Organization in Motor-Unit Pools. Fuglevand, et al 1993.
         simulation_time: Entire duration of the simulation (s).
         sampling_rate: Sampling frequency of the simulation (Hz).
@@ -86,11 +97,8 @@ class SurfaceEMG:
         peak_firing_rate_difference: The desired difference in peak firing rates between the first and last units (Hz).
         inter_spike_interval_coefficient_variation: The variance of inter spike interval coefficient.
 
-
     Returns:
-
       A list containing firing time arrays for each motor unit.
-      
     """
     ...
     
@@ -107,7 +115,7 @@ class SurfaceEMG:
     ramp = self.ramp
     inter_spike_interval_coefficient_variation = self.inter_spike_interval_coefficient_variation 
 
-    # Time vector
+  ### Time vector
     time_array = np.linspace(0, simulation_time, simulation_time*sampling_rate)
     self.time_array = time_array
     
@@ -126,6 +134,7 @@ class SurfaceEMG:
 
   ### Initialize the firing times for each motoneuron.
     firing_times_motor_unit = [[] for i in range(number_of_motor_units)]
+    #firing_times_motor_unit = np.array([], dtype=float)
 
     # iteration_variableate over each motoneuron.
     for i in range(number_of_motor_units):
@@ -158,6 +167,7 @@ class SurfaceEMG:
         inter_spike_interval = max(1 / (excitatory_gain * excitation_difference + minimum_firing_rate), 1 / peak_firing_rate_i[i])
 
         firing_times_motor_unit[i].append(firing_times_motor_unit[i][iteration_variable] + (inter_spike_interval_coefficient_variation * inter_spike_interval) * np.random.randn() + inter_spike_interval)
+        #firing_times_motor_unit = np.append(firing_times_motor_unit, [firing_times_motor_unit[iteration_variable] + (inter_spike_interval_coefficient_variation * inter_spike_interval) * np.random.randn() + inter_spike_interval])
 
         # Update the firing counter.
         iteration_variable += 1
@@ -174,26 +184,24 @@ class SurfaceEMG:
     #print('Firing Times for each Motor Unit', firing_times_motor_unit)
     return firing_times_motor_unit
   
-  #########################    ######################### Plot Recruitment Model ##########################    #######################
+  #########################  2  #########################  Plot Recruitment Model  ##########################    #######################
   def plot_recruitment_model(self):
-    """Generates the recruitment and rate coding organization of motor units.
+    """Plots the firing patterns of the motor unit recruitment.
 
     Arguments:
-
       firing_times_motor_unit
       time_array
 
     Returns:
-
       A plot of the recruitment model for each motor unit.
-      
     """
     ...
 
+  ### Default arguments:
     firing_times_motor_unit = self.simulate_recruitment_model()
     time_array = self.time_array
 
-    # En lista med olika färger för varje motor enhet
+  ### En lista med olika färger för varje motor enhet
     #colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
     def generate_unique_colors(num_colors):
       unique_colors = set()
@@ -210,9 +218,9 @@ class SurfaceEMG:
     num_colors = self.number_of_motor_units  # Ange det önskade antalet unika färger här
     colors = generate_unique_colors(num_colors)
 
+  ### Plot of the firing times motor unit
     fig4 = plt.figure(4)
     for i, time_array in enumerate(firing_times_motor_unit):
-      print(len(time_array))
       color = colors[i % len(colors)]  # Välj en färg från listan baserat på i
       plt.plot(time_array, [i] * len(time_array), '|', color = color, label = f'Motor Unit {i + 1}')
 
@@ -223,8 +231,29 @@ class SurfaceEMG:
 
     return plt.show()
   
-  #########################    #########################  Simulate Suface Electromyography  ##########################    #######################
-  def simulate_suface_EMG(self):
+  #########################  3  #########################  Simulate Surface Electromyography  ##########################    #######################
+  def simulate_surface_emg(self):
+    """Simulates the surface electromyography based on the recruitment model.
+
+    Arguments:
+      firing_times_motor_unit
+      time_array
+      motor_unit_i
+      twitch_force_range
+      number_of_motor_units
+      motor_unit_density
+      smallest_motor_unit_number_of_fibres
+      largest_motor_unit_number_of_fibres
+      muscle_fibre_diameter
+      muscle_cross_sectional_diameter
+      electrodes_in_z
+      electrodes_in_x
+
+    Returns:
+      A list containing an array with the simulated surface electromyography based on the recruitment model of each motor unit for all electrodes.
+    """
+    ...
+
     firing_times_motor_unit = self.simulate_recruitment_model()
     time_array = self.time_array
     motor_unit_i = MotorUnit()
@@ -242,41 +271,33 @@ class SurfaceEMG:
     # Calculate the peak twitch force for each unit accroding to equation (13) in Fuglevand 1993.
     b = (np.log(twitch_force_range) / number_of_motor_units) # Constant related to eq. (13).
     peak_twitch_force = np.exp(b*(np.arange(1, number_of_motor_units + 1, 1))) # Pi, where i = np.arange(1, number_of_motor_units + 1, 1)
-    #print(peak_twitch_force) # 1.02329299 to  100.  
     
     # The numbmer of muscle fibres required to exert one unit of force (1 unit force ≈ twitch force of smallest motor unit)
     total_peak_twitch_forces = np.sum(peak_twitch_force) # P_tot
-    #print(total_peak_twitch_forces) # 4349.205332433778
 
     ## Calculate the total number of fibres (nf_tot) in a muscle, with a cross-sectional area (Am) and average area of a muscle fiber (Af). 
     # The muscle cross-sectional area (mm^2)
     Am = np.pi * (muscle_cross_sectional_diameter/2)**2 # Am
-    #print(Am) # 176.71458676442586
+
     # The muscle fibre average area (mm^2)
     Af = np.pi * (muscle_fibre_diameter/2)**2 # Af
-    #print(Af) # 0.0016619025137490004
 
     nf_tot = Am/Af # nf_tot 
-    #print(nf_tot) # 106332.7032136106
 
     ## The number of fibres (nf_i) innervated by each motor unit according to equation (21) Fuglevand et al 1993.
     number_of_fibres = (nf_tot/total_peak_twitch_forces) * peak_twitch_force # nf_i
-    #print(number_of_fibres) # 25.01825086  to 2444.87659437
 
   ### The area encompassed by each motor-unit territory (Ai), was then calculated from the unit fibre density according to equation (22) Fuglevand et al 1993
     motor_unit_area = number_of_fibres/motor_unit_density # Ai
-    #print(motor_unit_area) #  1.25091254 to 122.24382972  (mm^2)
 
     motor_unit_radius = (motor_unit_area/np.pi)
-    #print(motor_unit_radius) # 0.39817783  to 38.91141952  (mm)
   
-  ### Calculate simuations of the suface EMG signal
+  ### Calculate simuations of the surface EMG signal
     simulations = []
 
     for m, element in enumerate(firing_times_motor_unit):
       motor_unit_i.number_of_fibres = int(number_of_fibres[m])
       motor_unit_i.motor_unit_radius = motor_unit_radius[m]
-      motor_unit_i.fibre_depth = 10
       motor_unit_i.number_of_electrodes_z = electrodes_in_z
       motor_unit_i.number_of_electrodes_x = electrodes_in_x
   
@@ -297,71 +318,75 @@ class SurfaceEMG:
     
     return simulations
   
-  #########################    #########################  Plot Suface Electromyography  ##########################    #######################
-  def plot_suface_EMG(self):
-    simulations = self.simulate_suface_EMG()
-    simulation = self.simulation
+  #########################  4  #########################  Plot Suface Electromyography Array  ##########################    #######################
+  def plot_suface_emg_array(self):
+    """Generates the recruitment and rate coding organization of motor units.
+
+    Arguments:
+      firing_times_motor_unit
+      time_array
+
+    Returns:
+      A plot of the recruitment model for each motor unit.
+    """
+    ...
+
+  ### Default arguments:
+    simulations = self.simulate_surface_emg()
     time_array = self.time_array
+    y_limit_minimum = self.y_limit_minimum
+    y_limit_maximum = self.y_limit_maximum
+    number_of_electrodes_z = self.electrodes_in_z
+    number_of_electrodes_x = self.electrodes_in_x
 
-    fig5 = plt.figure(5)
-  # Plot the simulations for each motor unit without sum
-    for s, simulation in enumerate(simulations):
-      plt.plot(time_array, -simulation[0,:]) # Plot the first row (motor unit 0)
-
-    fig6 = plt.figure(6)
-  ### Plot the simulations for each motor unit after sum
-    electrode_one_sum = np.zeros(simulation.shape[1])
-    #print(len(simulations))
+    electrode_one_sum = np.zeros((number_of_electrodes_z * number_of_electrodes_x, len(time_array)))
   
-    for s, simulation in enumerate(simulations):
-      electrode_one_sum += simulation[0,:]
-      #print(simulation.shape)
-    plt.plot(time_array, -electrode_one_sum) # Plot the first row (motor unit 0)
-      #for ne in range(len(simulation)):
-        #plt.plot(simulation, [ne] * len(simulation))  
+    for m, simulation in enumerate(simulations):
+      for ne in range(simulation.shape[0]):
+        electrode_one_sum[ne, :] += simulation[ne,:]
+
+  ### Plot the normalized motor unit action potential
+    normalized_simulation = - electrode_one_sum
+    normalized_simulation = (normalized_simulation - normalized_simulation.mean()) / (normalized_simulation.max() - normalized_simulation.min())
+
+    # The single fibre action potentials recorded by the electrodes positioned along the length of the fibre.
+    array_size = np.arange(1, (number_of_electrodes_z*number_of_electrodes_x)+1, 1)
+    zeros_array = np.zeros(len(array_size))
+    array_size_x = np.arange(0, number_of_electrodes_z*number_of_electrodes_x, number_of_electrodes_x)
+    array_size_x = np.append(array_size_x, zeros_array)
     
-    plt.xlabel('Time')
-    plt.ylabel('EMG Signal')
-    plt.title('EMG Signal with Action Potentials')
-
   ### Plot the simulations for each motor unit as an array 
-    for i, simulation in enumerate(simulations):
-    ### Default arguments:
-      motor_unit = simulation
-      y_limit_minimum = self.y_limit_minimum
-      y_limit_maximum = self.y_limit_maximum
-      number_of_electrodes_z = self.electrodes_in_z
-      number_of_electrodes_x = self.electrodes_in_x
+    fig8 = plt.figure(8)
+    for i in range(len(array_size)):
+      ax = plt.subplot(number_of_electrodes_z , number_of_electrodes_x, array_size[i])
+      plt.subplots_adjust(wspace=0.0, hspace=0.0)
+      ax.grid(which = 'both', ls = 'dashed')
+      plt.plot(time_array, normalized_simulation[i, :])
+      plt.xlim(time_array[0], time_array[-1] - 1)
+      if i < len(array_size) - number_of_electrodes_x:
+        ax.xaxis.set_major_formatter(NullFormatter())
+      plt.ylim(y_limit_minimum,y_limit_maximum)
+      ax.yaxis.set_major_formatter(NullFormatter())
+      if i == 0:
+        ax.set_ylabel(1, rotation = 0, ha = 'center', va = 'center', fontsize = 15)
+      for j in range(i):
+        if i == array_size_x[j]:
+          ax.set_ylabel(array_size[j], rotation = 0, ha = 'center', va = 'center', fontsize = 15)
+        elif number_of_electrodes_x == 1:
+          ax.set_ylabel(array_size[j]+1, rotation = 0, ha = 'center', va = 'center', fontsize = 15)
+    plt.suptitle('The Surface Electromyography Signal Array', fontsize = 20)
 
-    ### Plot the normalized motor unit action potential
-      normalized_motor_unit = - motor_unit
-      normalized_motor_unit = (normalized_motor_unit - normalized_motor_unit.mean()) / (normalized_motor_unit.max() - normalized_motor_unit.min())
-
-      # The single fibre action potentials recorded by the electrodes positioned along the length of the fibre.
-      array_size = np.arange(1, (number_of_electrodes_z*number_of_electrodes_x)+1, 1)
-      zeros_array = np.zeros(len(array_size))
-      array_size_x = np.arange(0, number_of_electrodes_z*number_of_electrodes_x, number_of_electrodes_x)
-      array_size_x = np.append(array_size_x,zeros_array)
-
-      fig7 = plt.figure(7)
-      for i in range(len(array_size)):
-          ax = plt.subplot(number_of_electrodes_z , number_of_electrodes_x, array_size[i])
-          plt.subplots_adjust(wspace=0.0, hspace=0.0)
-          ax.grid(which = 'both', ls = 'dashed')
-          plt.plot(time_array, normalized_motor_unit[i, :])
-          plt.xlim(time_array[0], time_array[-1] - 1)
-          if i < len(array_size) - number_of_electrodes_x:
-            ax.xaxis.set_major_formatter(NullFormatter())
-          plt.ylim(y_limit_minimum,y_limit_maximum)
-          ax.yaxis.set_major_formatter(NullFormatter())
-          if i == 0:
-                  ax.set_ylabel(1, rotation = 0, ha = 'center', va = 'center', fontsize=15)
-          for j in range(i):
-              if i == array_size_x[j]:
-                  ax.set_ylabel(array_size[j], rotation = 0, ha = 'center', va = 'center', fontsize=15)
-      plt.suptitle('EMG Signal with Action Potentials', fontsize=20)
-      fig5.supxlabel('Time (ms)')
-      fig5.supylabel('EMG Signal')
+    if number_of_electrodes_x > 1:
+      fig8.supxlabel('Time (s)\n Electrodes in the x direction, i.e. vertically across the fiber')
+    else:
+      fig8.supxlabel('Time (s)')
+    if number_of_electrodes_z > 1:
+      fig8.supylabel('sEMG Signal\n Electrodes in the z direction, i.e. along the fiber', ha = 'center', va = 'center')
+    else: 
+      fig8.supylabel('sEMG Signal', ha = 'center', va = 'center')
 
     return plt.show()
  
+#  #########################    #########################               ##########################    #######################
+                                                          # THE END #
+#  #########################    #########################               ##########################    #######################
