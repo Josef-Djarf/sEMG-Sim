@@ -1,6 +1,15 @@
 # sEMG-Sim version: 1.0
   Surface Electromyography Simulator
 
+# install
+
+To install, clone the repository and run:
+
+```
+pip install -e .
+```
+in the root folder.
+
 # Authors: Ahmad Alosta & Josef Erik Djärf 
 This code is the result of our Master's thesis project. What follows below is some general information about the project and a discription of the project.
 Our objective was to implement an sEMG simulation model in Python. The model is based on mathematical models obtained
