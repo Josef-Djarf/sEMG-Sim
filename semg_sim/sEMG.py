@@ -1,4 +1,4 @@
-from MU import MotorUnit
+from semg_sim.MU import MotorUnit
 import numpy as np
 import matplotlib.pyplot as plt
 import random
