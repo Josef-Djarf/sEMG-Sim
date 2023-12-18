@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import NullFormatter
+import scipy.io
 plt.rcParams['font.family'] = 'Times New Roman'
 
 class MotorUnit:
@@ -29,7 +30,7 @@ class MotorUnit:
       conduction_velocity: Conduction velocity along the muscle fibre (m/s). 
       electrode_shift: Position of center of electrode array along the length of the fibre (mm). [electrode_shift = neuromuscular_junction means the array sits centered above NMJ.]
       number_of_electrodes_z: Number of elecrodes in the array, in the direction of the fibre.
-      number_of_electrodes_x: Number of electrodes in the array across the fiber.
+      number_of_electrodes_x: Number of electrodes in the array across the fibre.
       inter_electrode_spacing: Distance between electrodes in the array (mm).
       radial_conductivity: Conductivity in radial direction, across the fibre (m/s).
       ratio_axial_radial_conductivity: Ratio between axial and radial conductivity, (fibre direction conductivity / radial conductivity)
@@ -56,23 +57,23 @@ class MotorUnit:
     self.B:float = -90e-3
     self.C:int = 1
     self.plot_length:int = 20
-    self.scaling_factor:int = 1
+    self.scaling_factor:float = 1
 
   ### Default values for a single fibre:
     self.fibre_length:int = 210 
     self.conduction_velocity:int = 4 
-    self.ratio_axial_radial_conductivity:int = 6 
+    self.ratio_axial_radial_conductivity:int = 6 # 0.001
     self.radial_conductivity:float = 0.303
-    self.inter_electrode_spacing:float = 1 # 1 cm
+    self.inter_electrode_spacing:float = 10 # 20 mm
     self.number_of_electrodes_z:int = 1
     self.number_of_electrodes_x:int = 1
-    self.electrode_shift:int = 165 # z-axis
+    self.electrode_shift:int = 165 # 75 z-axis
     self.initial_neuromuscular_junction:int = 90
     self.fibre_depth:float = 10
     self.x_position_single_fibre:float = 10
     self.extermination_zone_width:int = 10
     self.innervation_zone_width:int = 5
-    self.time_length:int = 35 
+    self.time_length:int = 35
 
   ### Default values for a motor unit:
     self.motor_unit_radius:float = 1
@@ -156,55 +157,7 @@ class MotorUnit:
 
     return poles_amplitude
 
-  #########################  2  #########################  Plot Current Distribution & Action Potential   ##########################    #######################
-  def plot_current_distribution_action_potential(self):
-    """Plots the membrane current distribution and action potential.
-
-    Args:
-      current_distribution
-      action_potential
-      z: Sampled vector of plotting
-
-    Returns:
-      A plot of the current distribution and action potential.
-    """
-    ...
-
-  ### default arguments
-    self.get_tripole_amplitude()
-    current_distribution = self.current_distribution
-    action_potential = self.action_potential
-    z = self.z
-
-  #########################  Normalization and Plot  #######################
-  ### Plot the normalized current distribution and action potential
-    # Normalize the signals using min-max feature scaling between points y_limit_minimum and y_limit_maximum.
-    y_limit_minimum = self.y_limit_minimum
-    y_limit_maximum = self.y_limit_maximum
-
-    #normalized_current_distribution = y_limit_minimum + ((current_distribution - current_distribution.min())*(y_limit_maximum-y_limit_minimum)) / (current_distribution.max() - current_distribution.min())
-    #normalized_action_potential = y_limit_minimum + ((action_potential - action_potential.min())*(y_limit_maximum-y_limit_minimum)) / (action_potential.max() - action_potential.min())
-
-    fig1 = plt.figure(1)
-
-    ax = plt.subplot(2,1,1)
-    plt.plot(z, current_distribution*1000)
-    plt.ylabel('Im, Current Distribution (mA)')
-    #plt.yticks([y_limit_minimum, 0 , y_limit_maximum])
-    ax.xaxis.set_major_formatter(NullFormatter())
-    plt.title('Membrane Current Distribution')
-
-    ax = plt.subplot(2,1,2)
-    plt.plot(z, action_potential*1000-180)
-    plt.ylabel('Vm, Action Potential (mV)')
-    #plt.yticks([y_limit_minimum, 0 , y_limit_maximum])
-    plt.title('Membrane Action Potential')
-
-    fig1.supxlabel('z, Distance (mm)')
-
-    return plt.show()
-
-  #########################  3  #########################  Get Pole Distance  ##########################    #######################
+  #########################  2  #########################  Get Pole Distance  ##########################    #######################
   def get_tripole_distance(self):
     """Calculates the distance between the poles of the current distribution.
 
@@ -257,6 +210,93 @@ class MotorUnit:
 
     return pole_distances
     
+  #########################  3  #########################  Plot Current Distribution & Action Potential   ##########################    #######################
+  def plot_current_distribution_action_potential(self):
+    """Plots the membrane current distribution and action potential.
+
+    Args:
+      current_distribution
+      action_potential
+      z: Sampled vector of plotting
+
+    Returns:
+      A plot of the current distribution and action potential.
+    """
+    ...
+
+  ### default arguments
+    poles_amplitude = self.get_tripole_amplitude()
+    pole_distances = self.get_tripole_distance()
+    current_distribution = self.current_distribution
+    action_potential = self.action_potential
+    z = self.z
+    pole_location_index = self.pole_location_index
+
+  #########################  Normalization and Plot  #######################
+  ### Plot the normalized current distribution and action potential
+    # Normalize the signals using min-max feature scaling between points y_limit_minimum and y_limit_maximum.
+    y_limit_minimum = self.y_limit_minimum
+    y_limit_maximum = self.y_limit_maximum
+
+    #normalized_current_distribution = y_limit_minimum + ((current_distribution - current_distribution.min())*(y_limit_maximum-y_limit_minimum)) / (current_distribution.max() - current_distribution.min())
+    #normalized_action_potential = y_limit_minimum + ((action_potential - action_potential.min())*(y_limit_maximum-y_limit_minimum)) / (action_potential.max() - action_potential.min())
+
+    fig1 = plt.figure(1)
+
+    ax = plt.subplot(2,1,1)
+    plt.plot(z, current_distribution*1000)
+    plt.ylabel('Im, Current Distribution (mA)')
+    #plt.axvline(z[np.argmax(current_distribution)], color = 'r', linestyle = '--', label = 'P1')
+    #plt.axvline(z[np.argmin(current_distribution)], color = 'g', linestyle = '--', label = 'P2')
+    #plt.legend()
+    y_p1 = poles_amplitude[0]*1000
+    y_p2 = poles_amplitude[1]*1000
+    y_p3 = poles_amplitude[2]*1000
+
+    p1_p2 = pole_distances[0]
+    p1_P3 = pole_distances[1]
+
+    x_p1 = z[pole_location_index[0]]
+    x_p2 = z[pole_location_index[1]]
+    x_p3 = z[pole_location_index[2]]
+
+    p1_location = (x_p2 - x_p1) / 2
+    p2_location = p1_location + p1_p2
+    p3_location = p1_location + p1_P3
+
+    plt.plot(p1_location, y_p1, 'o')
+    plt.text(p1_location + 0.2, y_p1, 'P1')
+    plt.vlines(x = p1_location, ymin = 0, ymax = y_p1, color = 'k')
+    
+    plt.plot(p2_location, y_p2, 'o')
+    plt.text(p2_location + 0.2, y_p2, 'P2')
+    plt.vlines(x = p2_location, ymin = 0, ymax = y_p2, color = 'k')
+ 
+    plt.plot(p3_location, y_p3, 'o')
+    plt.text(p3_location + 0.2, y_p3, 'P3')
+    plt.vlines(x = p3_location, ymin = 0, ymax = y_p3, color = 'k')
+
+    #plt.yticks([y_limit_minimum, 0 , y_limit_maximum])
+    ax.xaxis.set_major_formatter(NullFormatter())
+    plt.title('Membrane Current Distribution', fontweight = 'bold')
+
+    ax = plt.subplot(2,1,2)
+    plt.plot(z, action_potential*1000-180)
+    plt.ylabel('Vm, Action Potential (mV)')
+    #plt.yticks([y_limit_minimum, 0 , y_limit_maximum])
+    plt.title('Membrane Action Potential', fontweight = 'bold')
+
+    fig1.supxlabel('z, Distance (mm)')
+
+    A = self.A
+    
+    # Set the desired resolution
+    plt.savefig('current_and_action_potential_{}mA_amplitude.png'.format(A*1000), dpi = 600)
+    scipy.io.savemat('current' + '.mat', {'Im': current_distribution})
+    scipy.io.savemat('action_potential' + '.mat', {'Vm': action_potential})
+    
+    return plt.show()
+
   #########################  4  #########################  Simulate Fibre Action Potential  ##########################    #######################
   def simulate_fibre_action_potential(self):
     """Simulates the action potentials recorded by all electrodes for one fibre.
@@ -356,6 +396,7 @@ class MotorUnit:
     location_poles_all = np.vstack((location_poles_right, location_poles_left))
 
   ### Find and replace out of bounds locations at muscle fibre ends, both postive and negative end. Repalce out of bounds locations with fibre bound.
+    # To get Merletti simulation
     #location_poles_all[location_poles_all < left_tendon_end_variation] = left_tendon_end_variation
     #location_poles_all[location_poles_all > fibre_length] = fibre_length
 
@@ -377,11 +418,14 @@ class MotorUnit:
     # Finding the potentials observed at each electrode.
     for z in range(number_of_electrodes_z):
         for x in range(number_of_electrodes_x):
-          single_fibre_action_potential[z, x, :] = (1/(2*np.pi * radial_conductivity) * np.sum((Pi / (np.sqrt(((electrode_locations_x[x] - x_position_single_fibre)**2 + fibre_depth**2) * ratio_axial_radial_conductivity + (electrode_locations_z[z] - location_poles_all)**2))), axis=0))
+          single_fibre_action_potential[z, x, :] = (1/(2*np.pi * radial_conductivity) * np.sum((Pi / (np.sqrt(((electrode_locations_x[x] - x_position_single_fibre)**2 + fibre_depth**2) * ratio_axial_radial_conductivity + np.exp(0.09*np.abs((electrode_locations_z[z]-neuromuscular_junction)))*(electrode_locations_z[z] - location_poles_all)**2))), axis=0))
+          # To get Merletti simulation
+          #single_fibre_action_potential[z, x, :] = (1/(2*np.pi * radial_conductivity) * np.sum((Pi / (np.sqrt(((electrode_locations_x[x] - x_position_single_fibre)**2 + fibre_depth**2) * ratio_axial_radial_conductivity + (electrode_locations_z[z] - location_poles_all)**2))), axis=0))
     single_fibre_action_potential = np.reshape(single_fibre_action_potential, (len(electrode_locations_z)*len(electrode_locations_x), len(time_array)))
 
     #print('Single Fibre Action Potential', single_fibre_action_potential)
-    return single_fibre_action_potential
+    
+    return -single_fibre_action_potential
 
   #########################  5  #########################  Plot Fibre Action Potential  ##########################    #######################
   def plot_fibre_action_potential(self):
@@ -410,7 +454,7 @@ class MotorUnit:
     number_of_electrodes_x = self.number_of_electrodes_x
 
   ### Plot the normalized single fibre action potential
-    normalized_single_fibre_action_potential = - single_fibre_action_potential
+    normalized_single_fibre_action_potential = single_fibre_action_potential
     normalized_single_fibre_action_potential = (normalized_single_fibre_action_potential - normalized_single_fibre_action_potential.mean()) / (normalized_single_fibre_action_potential.max() - normalized_single_fibre_action_potential.min())
 
     # The single fibre action potentials recorded by the electrodes positioned along the length of the fibre.
@@ -431,16 +475,20 @@ class MotorUnit:
       plt.ylim(y_limit_minimum,y_limit_maximum)
       ax.yaxis.set_major_formatter(NullFormatter())
       if i == 0:
-        ax.set_ylabel(1, rotation = 0, ha = 'center', va = 'center', fontsize=15)
+        ax.set_ylabel(1, rotation = 0, ha = 'center', va = 'center', fontsize = 15)
       for j in range(i):
         if i == array_size_x[j]:
-          ax.set_ylabel(array_size[j], rotation = 0, ha = 'center', va = 'center', fontsize=15)
+          ax.set_ylabel(array_size[j], rotation = 0, ha = 'center', va = 'center', fontsize = 15)
         elif number_of_electrodes_x == 1:
           ax.set_ylabel(array_size[j]+1, rotation = 0, ha = 'center', va = 'center', fontsize = 15)
 
-    plt.suptitle('Single Fibre Action Potential', fontsize=20)
-    fig2.supxlabel('Time (ms)\n Electrodes in the x direction, i.e. vertically across the fiber')
-    fig2.supylabel("Electrodes in the z direction, i.e. along the fiber")
+    plt.suptitle('Single Fibre Action Potential', fontsize = 20, fontweight = 'bold')
+    fig2.supxlabel('Time (ms)\n Electrodes in the x direction, i.e. vertically across the fibre', fontsize = 15)
+    fig2.supylabel('Electrodes in the z direction, i.e. along the fibre', fontsize = 15)
+
+    # Set the desired resolution
+    plt.savefig('single_fibre_action_potential_{}X{}.png'.format(number_of_electrodes_z,number_of_electrodes_x), dpi = 600)
+    scipy.io.savemat('single_fibre_action_potential_'  + str(number_of_electrodes_z) + 'X' + str(number_of_electrodes_x)  + '.mat', {'SFAP': single_fibre_action_potential})
 
     return plt.show()
   
@@ -524,7 +572,7 @@ class MotorUnit:
     number_of_electrodes_x = self.number_of_electrodes_x
 
   ### Plot the normalized motor unit action potential
-    normalized_motor_unit = - motor_unit
+    normalized_motor_unit = motor_unit
     normalized_motor_unit = (normalized_motor_unit - normalized_motor_unit.mean()) / (normalized_motor_unit.max() - normalized_motor_unit.min())
 
     # The single fibre action potentials recorded by the electrodes positioned along the length of the fibre.
@@ -551,18 +599,22 @@ class MotorUnit:
         elif number_of_electrodes_x == 1:
           ax.set_ylabel(array_size[j]+1, rotation = 0, ha = 'center', va = 'center', fontsize = 15)
       plt.ylim(y_limit_minimum,y_limit_maximum)
-    plt.suptitle('Motor Unit Action Potential', fontsize = 20)
+    plt.suptitle('Motor Unit Action Potential', fontsize = 20, fontweight = 'bold')
     if number_of_electrodes_x > 1:
-      fig3.supxlabel('Time (ms)\n Electrodes in the x direction, i.e. vertically across the fiber')
+      fig3.supxlabel('Time (ms)\n Electrodes in the x direction, i.e. vertically across the fibre', fontsize = 15)
     else:
-      fig3.supxlabel('Time (ms)')
+      fig3.supxlabel('Time (ms)', fontsize = 15)
     if number_of_electrodes_z > 1:
-      fig3.supylabel('Motor Unit Action Potential\n Electrodes in the z direction, i.e. along the fiber',  ha = 'center', va = 'center')
+      fig3.supylabel('Motor Unit Action Potential\n Electrodes in the z direction, i.e. along the fibre',  ha = 'center', va = 'center', fontsize = 15)
     else:
-      fig3.supylabel('Motor Unit Action Potential', ha = 'center', va = 'center')
+      fig3.supylabel('Motor Unit Action Potential', ha = 'center', va = 'center', fontsize = 15)
+
+    # Set the desired resolution
+    plt.savefig('one_motor_unit_action_potential_{}X{}.png'.format(number_of_electrodes_z,number_of_electrodes_x), dpi = 600)
+    scipy.io.savemat('one_motor_unit_action_potential_'  + str(number_of_electrodes_z) + 'X' + str(number_of_electrodes_x)  + '.mat', {'MUAP': motor_unit})
 
     return plt.show()
   
 #  #########################    #########################               ##########################    #######################
-                                                          # THE END #
+                                                           # THE END #
 #  #########################    #########################               ##########################    #######################
