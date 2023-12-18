@@ -240,7 +240,7 @@ class SurfaceEMG:
 
     plt.xlabel('Time (s)', fontsize = 15)
     plt.ylabel('Motor Unit Number', fontsize = 15)
-    plt.title('Firing Times of Motoneurons', fontsize = 20, fontweight = 'bold')
+    plt.title('Firing Times of Motor Units', fontsize = 20, fontweight = 'bold')
     plt.grid(axis = 'x')
 
     number_of_motor_units = self.number_of_motor_units
