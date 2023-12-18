@@ -10,17 +10,14 @@ pip install -e .
 ```
 in the root folder.
 
-# Authors: Ahmad Alosta & Josef Erik Djärf 
+# General Info:
 This code is the result of our Master's thesis project. What follows below is some general information about the project and a discription of the project.
 Our objective was to implement an sEMG simulation model in Python. The model is based on mathematical models obtained
 from scientific literature. The model contains several adjustable parameters including motor unit properties (size, firing rate, etc),
-volume conductor, and setup for the recording electrodes.
-
-In association with the Neuroengineering group, Departement of Biomedical Engineering, Faculty of Engineering, Lund Universty, Sweden.
+volume conductor, and setup for the recording electrodes. The work has been completed in association with the Neuroengineering group, Departement of Biomedical Engineering, Faculty of Engineering, Lund Universty, Sweden.
 
 # Title:
 Multiple parameter modelling of synthetic electromyography (EMG) data.
-
 
 # Authors:  Ahmad Alosta & Josef Djärf
 # Supervisors: Robin Rohlén, & Jonathan Lundsberg (Assistant)
