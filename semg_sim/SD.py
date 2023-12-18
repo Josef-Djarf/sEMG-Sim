@@ -26,7 +26,7 @@ class SaveData:
       y_limit_minimum: Minimum value of plot y-axis.
       y_limit_minimum: Maximum value of plot y-axis.
       number_of_electrodes_z: Number of elecrodes in the array, in the direction of the fibre.
-      number_of_electrodes_x: Number of electrodes in the array across the fiber.
+      number_of_electrodes_x: Number of electrodes in the array across the fibre.
       time_length:
       delta_time:
       simulation_time: Total simulation time in seconds.
@@ -113,7 +113,7 @@ class SaveData:
     time_array = np.arange(0, time_length + delta_time, delta_time)  
 
   ### Plot the normalized motor unit action potential
-    normalized_motor_unit = - motor_unit_array
+    normalized_motor_unit = motor_unit_array
     normalized_motor_unit = (normalized_motor_unit - normalized_motor_unit.mean()) / (normalized_motor_unit.max() - normalized_motor_unit.min())
 
     # The single fibre action potentials recorded by the electrodes positioned along the length of the fibre.
@@ -140,13 +140,13 @@ class SaveData:
           ax.set_ylabel(array_size[j], rotation = 0, ha = 'center', va = 'center', fontsize = 15)
         elif number_of_electrodes_x == 1:
           ax.set_ylabel(array_size[j]+1, rotation = 0, ha = 'center', va = 'center', fontsize = 15)
-    plt.suptitle('Motor Unit Action Potential', fontsize = 20)
+    plt.suptitle('Motor Unit Action Potential', fontsize = 20, fontweight = 'bold')
     if number_of_electrodes_x > 1:
-      fig1.supxlabel('Time (ms)\n Electrodes in the x direction, i.e. vertically across the fiber')
+      fig1.supxlabel('Time (ms)\n Electrodes in the x direction, i.e. vertically across the fibre')
     else:
       fig1.supxlabel('Time (ms)')
     if number_of_electrodes_z > 1:
-      fig1.supylabel('Motor Unit Action Potential\n Electrodes in the z direction, i.e. along the fiber',  ha = 'center', va = 'center')
+      fig1.supylabel('Motor Unit Action Potential\n Electrodes in the z direction, i.e. along the fibre',  ha = 'center', va = 'center')
     else:
       fig1.supylabel('Motor Unit Action Potential', ha = 'center', va = 'center')
 
@@ -190,7 +190,7 @@ class SaveData:
       electrode_sum[ne,:] = motor_unit_sum
 
   ### Plot the normalized motor unit action potential
-    normalized_simulation = - electrode_sum
+    normalized_simulation = electrode_sum
     #normalized_simulation = (normalized_simulation - normalized_simulation.mean()) / (normalized_simulation.max() - normalized_simulation.min())
     normalized_simulation = y_limit_minimum + ((normalized_simulation - normalized_simulation.min())*(y_limit_maximum-y_limit_minimum)) / (normalized_simulation.max() - normalized_simulation.min())
 
@@ -222,11 +222,11 @@ class SaveData:
     plt.suptitle('The Surface Electromyography Signal', fontsize = 20)
 
     if number_of_electrodes_x > 1:
-      fig2.supxlabel('Time (s)\n Electrodes in the x direction, i.e. vertically across the fiber')
+      fig2.supxlabel('Time (s)\n Electrodes in the x direction, i.e. vertically across the fibre')
     else:
       fig2.supxlabel('Time (s)')
     if number_of_electrodes_z > 1:
-      fig2.supylabel('Normalized sEMG Signal\n Electrodes in the z direction, i.e. along the fiber', ha = 'center', va = 'center')
+      fig2.supylabel('Normalized sEMG Signal\n Electrodes in the z direction, i.e. along the fibre', ha = 'center', va = 'center')
     else: 
       fig2.supylabel('Normalized sEMG Signal', ha = 'center', va = 'center')
 
@@ -264,7 +264,7 @@ class SaveData:
     time_array = np.linspace(0, simulation_time, simulation_time*sampling_rate) 
 
   ### Plot the normalized motor unit action potential
-    normalized_simulation = - surface_emg_array
+    normalized_simulation = surface_emg_array
     #normalized_simulation = (normalized_simulation - normalized_simulation.mean()) / (normalized_simulation.max() - normalized_simulation.min())
     normalized_simulation = y_limit_minimum + ((normalized_simulation - normalized_simulation.min())*(y_limit_maximum-y_limit_minimum)) / (normalized_simulation.max() - normalized_simulation.min())
 
@@ -293,14 +293,14 @@ class SaveData:
         elif number_of_electrodes_x == 1:
           ax.set_ylabel(array_size[j]+1, rotation = 0, ha = 'center', va = 'center', fontsize = 15)
       plt.ylim(y_limit_minimum,y_limit_maximum)
-    plt.suptitle('The Surface Electromyography Signal', fontsize = 20)
+    plt.suptitle('The Surface Electromyography Signal', fontsize = 20, fontweight = 'bold')
 
     if number_of_electrodes_x > 1:
-      fig3.supxlabel('Time (s)\n Electrodes in the x direction, i.e. vertically across the fiber')
+      fig3.supxlabel('Time (s)\n Electrodes in the x direction, i.e. vertically across the fibre')
     else:
       fig3.supxlabel('Time (s)')
     if number_of_electrodes_z > 1:
-      fig3.supylabel('Normalized sEMG Signal\n Electrodes in the z direction, i.e. along the fiber', ha = 'center', va = 'center')
+      fig3.supylabel('Normalized sEMG Signal\n Electrodes in the z direction, i.e. along the fibre', ha = 'center', va = 'center')
     else: 
       fig3.supylabel('Normalized sEMG Signal', ha = 'center', va = 'center')
 
@@ -331,11 +331,11 @@ class SaveData:
     for m, simulation in enumerate(surface_emg):
       electrod_one_sum += simulation[electrod_postion-1,:]
 
-    plt.plot(time_array, -electrod_one_sum*10**6) # Plot the electrode row postion with m numbers of motor units.
+    plt.plot(time_array, electrod_one_sum*10**6) # Plot the electrode row postion with m numbers of motor units.
     
     plt.xlabel('Time (s)')
     plt.ylabel('Amplitdue (µV)')
-    fig4.suptitle('sEMG Signal for One Electrode')
+    fig4.suptitle('sEMG Signal for One Electrode', fontweight = 'bold')
     
     return plt.show()
 
@@ -351,11 +351,11 @@ class SaveData:
 
     fig5 = plt.figure(5)
   ### Plot the simulations for each motor unit after sum
-    plt.plot(time_array, -surface_emg[electrod_postion-1,:]*10**6) # Plot the electrode row postion with m numbers of motor units.
+    plt.plot(time_array, surface_emg[electrod_postion-1,:]*10**6) # Plot the electrode row postion with m numbers of motor units.
     
     plt.xlabel('Time (s)')
     plt.ylabel('Amplitude (µV)')
-    fig5.suptitle('sEMG Signal for One Electrode')
+    fig5.suptitle('sEMG Signal for One Electrode', fontweight = 'bold')
     
     return plt.show()
 
@@ -387,7 +387,12 @@ class SaveData:
     """
     ...
 
-    scipy.io.savemat(filename + '.mat', {'output': output_data})
+    sampling_rate = self.sampling_rate
+    number_of_electrodes_z = self.number_of_electrodes_z
+    number_of_electrodes_x = self.number_of_electrodes_x
+    
+    string = str(sampling_rate)
+    scipy.io.savemat(filename + '_' + number_of_electrodes_z + 'X' + number_of_electrodes_x + '_sf_' + string + '.mat', {'output': output_data})
 
     # Example usage:
 
@@ -395,7 +400,6 @@ class SaveData:
 
     # Use the code to save data in your folder here.
 
-
 #  #########################    #########################               ##########################    #######################
-                                                          # THE END #
+                                                           # THE END #
 #  #########################    #########################               ##########################    #######################
